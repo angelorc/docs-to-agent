@@ -73,7 +73,6 @@ describe("repoKey", () => {
   });
 });
 
-
 describe("injectIntoFile", () => {
   const key = "nuxt-nuxt";
   const index = "[nuxt Docs Index]|root: ./.docs-to-agent/nuxt-nuxt";

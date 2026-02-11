@@ -2,13 +2,13 @@
   "name": "docs-to-agent",
   "version": "0.1.0",
   "description": "Download docs from any GitHub repo and generate a compact index for AI coding agents",
+  "homepage": "https://github.com/angelorc/docs-to-agent",
+  "bugs": "https://github.com/angelorc/docs-to-agent/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/angelorc/docs-to-agent.git"
   },
-  "homepage": "https://github.com/angelorc/docs-to-agent",
-  "bugs": "https://github.com/angelorc/docs-to-agent/issues",
   "bin": {
     "docs-to-agent": "./dist/bin/cli.mjs"
   },
@@ -16,14 +16,14 @@
     "dist"
   ],
   "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     }
   },
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
   "scripts": {
     "build": "obuild",
     "dev": "obuild --stub",
@@ -39,21 +39,21 @@
     "publish": "changeset publish"
   },
   "dependencies": {
-    "commander": "^13.1.0",
+    "commander": "^14.0.3",
     "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.4",
-    "@types/node": "^22.13.1",
+    "@types/node": "^25.2.3",
     "automd": "^0.4.3",
     "obuild": "^0.4.27",
-    "oxfmt": "^0.28.0",
-    "oxlint": "^1.43.0",
+    "oxfmt": "^0.31.0",
+    "oxlint": "^1.46.0",
     "typescript": "^5.7.3",
-    "vitest": "^3.0.5"
+    "vitest": "^4.0.18"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "packageManager": "pnpm@10.6.2"
 }
