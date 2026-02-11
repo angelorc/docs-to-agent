@@ -1,9 +1,5 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "categories": {
-    "correctness": "error",
-    "suspicious": "warn"
-  },
-  "plugins": ["typescript", "oxc"],
-  "ignorePatterns": ["dist", "node_modules"]
+  "$schema": "https://unpkg.com/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "typescript", "oxc"],
+  "rules": {}
 }

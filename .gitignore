@@ -2,4 +2,7 @@ node_modules/
 dist/
 *.tsbuildinfo
 .docs-to-agent/
+
+.claude/
 AGENTS.md
+CLAUDE.md
