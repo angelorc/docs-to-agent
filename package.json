@@ -1,6 +1,6 @@
 {
   "name": "docs-to-agent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Download docs from any GitHub repo and generate a compact index for AI coding agents",
   "homepage": "https://github.com/angelorc/docs-to-agent",
   "bugs": "https://github.com/angelorc/docs-to-agent/issues",
