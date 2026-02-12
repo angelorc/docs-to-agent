@@ -2,8 +2,9 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { Command } from "commander";
-import pc from "picocolors";
+import { defineCommand, runMain } from "citty";
+import { consola } from "consola";
+import { colors } from "consola/utils";
 import {
   DOCS_BASE_DIR,
   buildDocTree,
@@ -16,31 +17,44 @@ import {
   repoKey,
 } from "../src/index.ts";
 
-const program = new Command();
-
-program
-  .name("docs-to-agent")
-  .description("Download docs from a GitHub repo and generate a compact index for AI coding agents")
-  .argument(
-    "<github-url>",
-    "GitHub URL with docs path (e.g. https://github.com/nuxt/nuxt/tree/main/docs)",
-  )
-  .option("-o, --output <file>", "Target file", "AGENTS.md")
-  .option("--name <name>", "Project name override (defaults to repo name)")
-  .action(async (url: string, opts: { output: string; name?: string }) => {
+const main = defineCommand({
+  meta: {
+    name: "docs-to-agent",
+    version: "0.1.0",
+    description:
+      "Download docs from a GitHub repo and generate a compact index for AI coding agents",
+  },
+  args: {
+    url: {
+      type: "positional",
+      description: "GitHub URL with docs path (e.g. https://github.com/nuxt/nuxt/tree/main/docs)",
+      required: true,
+    },
+    output: {
+      type: "string",
+      description: "Target file",
+      alias: "o",
+      default: "AGENTS.md",
+    },
+    name: {
+      type: "string",
+      description: "Project name override (defaults to repo name)",
+    },
+  },
+  run({ args }) {
     try {
-      console.log(pc.cyan("Parsing GitHub URL..."));
-      const parsed = parseGitHubUrl(url);
-      const projectName = opts.name || parsed.repo;
+      consola.start("Parsing GitHub URL...");
+      const parsed = parseGitHubUrl(args.url);
+      const projectName = args.name || parsed.repo;
       const key = repoKey(parsed.owner, parsed.repo);
-      console.log(
-        pc.dim(
-          `  repo: ${parsed.owner}/${parsed.repo}, branch: ${parsed.branch}, path: ${parsed.docsPath}`,
+      consola.info(
+        colors.dim(
+          `repo: ${parsed.owner}/${parsed.repo}, branch: ${parsed.branch}, path: ${parsed.docsPath}`,
         ),
       );
 
       const cwd = process.cwd();
-      console.log(pc.cyan("Downloading documentation..."));
+      consola.start("Downloading documentation...");
       const result = pullDocs({
         owner: parsed.owner,
         repo: parsed.repo,
@@ -48,12 +62,12 @@ program
         docsPath: parsed.docsPath,
         cwd,
       });
-      console.log(pc.green(`  Downloaded ${result.fileCount} doc files → ${result.localDocsDir}/`));
+      consola.success(`Downloaded ${result.fileCount} doc files → ${result.localDocsDir}/`);
 
       const localDocsDir = join(cwd, result.localDocsDir);
       const files = collectDocFiles(localDocsDir);
       if (files.length === 0) {
-        console.log(pc.yellow("No .md/.mdx files found in docs folder."));
+        consola.warn("No .md/.mdx files found in docs folder.");
         process.exit(1);
       }
 
@@ -65,28 +79,27 @@ program
         sections,
       });
 
-      const outputPath = resolve(cwd, opts.output);
+      const outputPath = resolve(cwd, args.output);
       let existingContent = "";
       if (existsSync(outputPath)) {
         existingContent = readFileSync(outputPath, "utf-8");
       }
       const updatedContent = injectIntoFile(existingContent, indexContent, key);
       writeFileSync(outputPath, updatedContent);
-      console.log(pc.green(`  Updated ${opts.output}`));
+      consola.success(`Updated ${args.output}`);
 
       const gitignoreResult = ensureGitignoreEntry(cwd, DOCS_BASE_DIR);
       if (gitignoreResult.updated) {
-        console.log(pc.dim(`  Added ${DOCS_BASE_DIR}/ to .gitignore`));
+        consola.info(colors.dim(`Added ${DOCS_BASE_DIR}/ to .gitignore`));
       }
 
-      console.log();
-      console.log(pc.green(pc.bold("Done!")));
-      console.log(pc.dim(`  ${files.length} docs indexed → ${opts.output} [${key}]`));
+      consola.box(`Done! ${files.length} docs indexed → ${args.output} [${key}]`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error(pc.red(`Error: ${msg}`));
+      consola.error(msg);
       process.exit(1);
     }
-  });
+  },
+});
 
-program.parse();
+runMain(main);
